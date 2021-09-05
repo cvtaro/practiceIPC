@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 int main (void) 
 {
@@ -20,6 +21,9 @@ int main (void)
     addr.sin_family = AF_INET;
     addr.sin_port = htons(12345);
     addr.sin_addr.s_addr = INADDR_ANY;
+    int option = 1;
+    // bind エラー回避のため，TIME_WAIT状態でもbind可能のオプションを追加
+    // setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&option, sizeof(option));
     if (bind(sock, (struct sockaddr *)& addr, sizeof(addr)) != 0) {
         perror("bind");
         return 1;
@@ -31,8 +35,8 @@ int main (void)
         return 1;
     }
 
-    // TCPクライアントからの接続要求を受ける
     while (1) {
+        // TCPクライアントからの接続要求を受ける
         struct sockaddr_in addr_client;
         socklen_t len_client;
         int sock_client;
@@ -43,6 +47,10 @@ int main (void)
             perror("accept");
             break;
         }
+        // クライアント情報を表示
+        printf("[s] accepted from %s, port = %5d\n",
+            inet_ntoa(addr_client.sin_addr), ntohs(addr_client.sin_port)
+        );
 
         // 送信
         int n;
