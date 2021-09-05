@@ -22,4 +22,4 @@ client       app       server
 ##  server
     appの要求を受信
     appに応答を送信
-    1s待つ
+    1s待つなどの処理をしてAPPに応答を返す。
